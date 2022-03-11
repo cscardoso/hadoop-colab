@@ -1,0 +1,128 @@
+sudo apt-get install  openssh-server openjdk-8-jdk vim
+
+
+
+# Conf ssh
+ssh-keygen
+cat .ssh/id_rsa.pub >> .ssh/authorized_keys
+cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
+
+# Hadoop
+
+## Download
+$ sudo su
+$ cd /opt
+$ mkdir framework
+$ chown curso:curso framework
+
+ctrl + d
+
+
+$ cd /opt/framework
+$ wget https://dlcdn.apache.org/hadoop/common/hadoop-3.3.1/hadoop-3.3.1.tar.gz
+$ tar xvzf hadoop-3.3.1.tar.gz
+$ mv hadoop-3.3.1  hadoop
+$ mkdir -p /opt/framework/hadoop/data/namenode
+$ mkdir -p /opt/framework/hadoop/data/datanode
+
+## Conf file
+
+$ cd /opt/framework/hadoop/etc/hadoop
+
+### hadoop-env.sh
+$ vim hadoop-env.sh
+
+	export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+
+### yarn-site.xml
+$ vim yarn-site.xml
+
+	<configuration>
+	   <property>
+	    	<name>yarn.nodemanager.aux-services</name>
+	    	<value>mapreduce_shuffle</value>
+	   </property>
+	   <property>
+	      	<name>yarn.nodemanager.auxservices.mapreduce.shuffle.class</name>  
+		<value>org.apache.hadoop.mapred.ShuffleHandler</value>
+	   </property>
+	</configuration>
+
+
+### hdfs-site.xml
+$ vim hdfs-site.xml
+
+	<configuration>
+	   <property>
+	       <name>dfs.replication</name>
+	       <value>1</value>
+	   </property>
+	   <property>
+	       <name>dfs.namenode.name.dir</name>
+	       <value>/opt/framework/hadoop/data/namenode</value>
+	   </property>
+	   <property>
+	       <name>dfs.datanode.data.dir</name>
+	       <value>/opt/framework/hadoop/data/datanode</value>
+	   </property>
+	</configuration>
+
+### mapred-site.xml
+$ vim mapred-site.xml
+
+	<configuration>
+	   <property>
+	       <name>mapreduce.framework.name</name>
+	       <value>yarn</value>
+	   </property>
+	</configuration>
+
+### core-site.xml
+$ vim core-site.xml
+
+	<configuration>
+	   <property>
+	       <name>fs.defaultFS</name>
+	       <value>hdfs://localhost:9000</value>
+	   </property>
+	</configuration>
+
+### ~/.bashrc
+$ vim ~/.bashrc
+
+	# Python
+	alias python=python3
+
+	# Java
+	export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+
+	# Hadoop
+	export HADOOP_HOME=/opt/framework/hadoop
+	export PATH=$PATH:$HADOOP_HOME/bin
+	export PATH=$PATH:$HADOOP_HOME/sbin
+	export HADOOP_MAPRED_HOME=$HADOOP_HOME
+	export HADOOP_COMMON_HOME=$HADOOP_HOME
+	export HADOOP_HDFS_HOME=$HADOOP_HOME
+	export YARN_HOME=$HADOOP_HOME
+	export HADOOP_COMMON_LIB_NATIVE_DIR=$HADOOP_HOME/lib/native
+	export HADOOP_OPTS="-Djava.library.path=$HADOOP_HOME/lib"
+
+
+## Commands
+
+$ hdfs namenode -format
+$ start-dfs.sh
+$ jps
+	4496 SecondaryNameNode
+	4625 Jps
+	4213 DataNode
+	4037 NameNode
+
+
+
+# Python3
+$ wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
+$ bash Miniconda3-latest-Linux-x86_64.sh
+### Após a instalação, fechar o terminal e abrir para entrar com o conda carregado no environment "base".
+$ pip install notebook
+$ pip install pyspark
